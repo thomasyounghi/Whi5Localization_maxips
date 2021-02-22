@@ -1,0 +1,109 @@
+#Make 1 big data frame each for raw YFP data, RFP data, info in the 'Data' folder
+#Identifies and labels replicates (experiments sharing the same strain and age of dox induction)
+#Add labels to be used for publication (redundant with the official strain names, doxtime, etc)
+
+
+setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips')
+source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/timeseries_func.Rd')
+source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/func.Rd')
+source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/Preprocessing_func.Rd')
+library(dplyr)
+library(stringr)
+
+#Open up all the files in data, to get one big file of info, YFP, RFP
+infofilestoopen = list.files("./Data/",pattern="[[:alnum:]]*revised2.csv")
+infofilestoopen = paste('./Data/',infofilestoopen,sep="")
+
+
+info = concatenatefiles(infofilestoopen)
+
+#Check for gaps in the budding time matrix
+bt = getbudtimes(info)
+btgaps = apply(bt,1,checkgaps)
+btdecreasing = apply(bt,1,checkdecreasing)
+btrepeats = apply(bt,1,checkrepeats)
+table(btgaps)
+table(btdecreasing)
+table(btrepeats)
+write.csv(info[btgaps,],'./ProblematicBTs/NAbetweenbts.csv',row.names=FALSE)
+write.csv(info[btdecreasing,],'./ProblematicBTs/decreasingbts.csv',row.names=FALSE)
+write.csv(info[btrepeats,],'./ProblematicBTs/repeatedbts.csv',row.names=FALSE)
+
+
+#In situations where there are repeated buddingtime, remove the repeated buddingtimes and shift the later budding times over
+condition = btrepeats & !btdecreasing & !btgaps
+bttofix = bt[condition,]
+fixedbt = t(apply(bttofix,1,removerepeatsinincreasing))
+birthcol = which(names(info)=='birth')
+info[condition,(birthcol+1):ncol(info)]=fixedbt
+
+#Eliminate all rows for which budding times are decreasing or there are gaps
+condition = !(btdecreasing | btgaps)
+table(condition)
+info = filter(info,condition)
+
+
+
+
+#Plot the birth distributions (boxplot). Also calculate the doxtime, which is important for all experiments.
+doxtime = info$lastibeforepart2 + info$firstpart2ipostdoxstart;
+info = cbind(doxtime,info);
+neworder = order(info$strain,doxtime,info$date,info$lane)
+info = info[neworder,]
+
+
+#Plot the birth distributions (boxplot). Replicates near one another. 
+experiment = paste(info$strain,info$doxtime, info$date,info$lane)
+experiment = factor(experiment)
+
+
+#Providing an id to each cell
+id = 1:nrow(info)
+
+
+
+#identifying replicates. Experiments sharing the same strain and doxycycline treatment time, but derived from different colonies. Order of the labeling specified by (date lane)
+replabel = identifyreplicates(info);
+
+
+
+#Labels to use for plotting
+expage = factor(info$doxtime)
+levels(expage) = c('young','old')
+expstrain = factor(info$strain,levels=c('yTY159b','yTY160a'))
+levels(expstrain) = c('SSAcontrol','SSAcontrol+RFPdegron')
+
+
+
+
+#adding the additional features to the info data frame
+#labels that make things easier to understand.  
+bt = getbudtimes(info)
+ageatdox = ageattimes(bt,info$doxtime)
+
+info = data.frame(id,expage,ageatdox,expstrain,replabel,experiment,info)
+date = as.character(info$date)
+date = str_match(date,"(\\w+)_")
+date = date[,2]
+info$date=date;
+
+
+#Another issue to check is the measured time between birth and the first bud. 
+#For some of the measurements, the time between the birth and first bud (X1) appears to be 1.  This is most likely a
+#bookkeeping discrepancy by the person recording the cells.
+#If info$X1-info$birth <=2, we remove X1 and shift 
+hist(info$X1 -info$birth)
+timetofb = (info$X1-info$birth)<=2
+timetofb1 = timetofb & (!is.na(timetofb))
+bt = getbudtimes(info)
+bt1=bt;
+bt1[which(timetofb1),1:(ncol(bt)-1)]= bt[which(timetofb1),2:ncol(bt)]
+bt1[which(timetofb1),ncol(bt1)] = NA
+info[,((which(colnames(info)=='birth'))+1):ncol(info)]=bt1
+
+#Annotating the yfp file with xy and trap information
+xy = info$xy
+trap = info$trap
+
+write.csv(info,"./CombinedData/infoall.csv",row.names=FALSE);
+
