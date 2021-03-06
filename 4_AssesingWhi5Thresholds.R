@@ -1,11 +1,16 @@
-#Assessing thresholds for calling YFPmax5by5 'nuclear'
-#We apply the threshold to each cell budding interval and assess the number of contiguous blocks for which the cell is above the
-#threshold and below it.
+#Assessing thresholds for the Whi5-YFP localization score used to call Whi5-YFP nuclear localized.
+#Whi5-YFP localization score = max5x5 - mean5x5 YFP pixel intensity
+#Different cutoffs are applied to each cell budding interval. Within each budding interval, the number of contiguous blocks for which the cell is above or below the cutoff are assessed for agreement with the prior literature showing Whi5 is nuclear localized once per cell cycle
+#For each cutoff, the fraction of budding intervals with 0 blocks below, exactly 1 block above, and > 1 block above the cutoff are calculated.  A desireable threshold will yield a low fraction with > 1 block above, low fraction with 0 blocks below, and relatively high fraction with exactly 1 block above.
+#The cutoff value of 0.0000425 
+#Results are saved in './Figures/ThresholdsForYFP+/'
 
-setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/timeseries_func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/Preprocessing_func.Rd')
+
+setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips_git')
+source('./functions/timeseries_func.Rd')
+source('./functions/func.Rd')
+source('./functions/Preprocessing_func.Rd')
+
 library(dplyr)
 library(ggplot2)
 library(reshape2)
@@ -15,6 +20,7 @@ library(cowplot)
 library(stringr)
 
 #figure settings:
+theme_set(theme_cowplot())
 ylogscale = scale_y_continuous(trans=log10_trans(),breaks=trans_breaks("log10",function(x) 10^x),labels=trans_format("log10",math_format(10^.x)),limits=c(0.2,2000))
 xscale = scale_x_continuous(limits = c(0,60),breaks = seq(0,60,12),labels=as.character(seq(0,10,2)))
 fonts = theme(axis.text=element_text(size=4), axis.title=element_text(size=4),strip.text.x = element_text(size = 1),plot.title=element_text(size=6))
