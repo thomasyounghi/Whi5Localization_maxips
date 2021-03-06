@@ -38,13 +38,11 @@ linewidth = 0.2
 pointsize = 0.2
 hlinewidth = 0.35
 
-
-
-#Making sure the old cells that we pick are over age 15
 outfolder = './Figures/FlTrajectories/'
-info = read.csv('./CombinedData/infoall2.csv')
 
-#
+
+#Reformating single cell budding times to plot with fluorescence
+info = read.csv('./CombinedData/infoall2.csv')
 bt = getbudtimes(info)
 cellid = paste(info$date,info$xy,info$trap)
 bts = data.frame(cellid,bt)
@@ -54,6 +52,8 @@ btsmelted = mutate(btsmelted,bt = value-155)
 
 #Reading in the fluorescence data
 fldata = read.csv('./CombinedData/flall.csv')
+
+#The cutoff for the YFP localization score used to assess whether Whi5-YFP was nuclear localized. See 'AssesingWhi5Thresholds.R'
 cutoff = 0.0000425
 
 #Plot the yfpmax5x5 and yfpmean on the same plots (20 cells for each of the lanes)
