@@ -1,10 +1,16 @@
-#Based on the combined data from multiple experiments, make a list of the cells that are of the appropriate ages for study
-#We only include cells from the old experiments >= age 15 at the time of doxycycline exposure
+#Plotting single cell Whi5-YFP localization scores for strains yTY159b and yTY160a
+#These are SSA (control) strains with Whi5-mCitrine, and either stable RFP (yTY159b) or RFPdegron (yTY160a)in the SSA (control) cassette
+#Whi5 localization score is defined to be max5x5 - mean5x5 YFP pixel value
+#Single cell trajectories of this score with overlaid budding times are plotted in './Figures/FlTrajectories/'
+#Single cell trajectories of the max5x5 and mean5x5 YFP pixels are also saved
 
-setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/timeseries_func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/Preprocessing_func.Rd')
+
+setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips_git')
+source('./functions/timeseries_func.Rd')
+source('./functions/func.Rd')
+source('./functions/Preprocessing_func.Rd')
+
+
 library(dplyr)
 library(ggplot2)
 library(reshape2)
@@ -14,6 +20,7 @@ library(cowplot)
 library(stringr)
 
 #figure settings:
+theme_set(theme_cowplot())
 ylogscale = scale_y_continuous(trans=log10_trans(),breaks=trans_breaks("log10",function(x) 10^x),labels=trans_format("log10",math_format(10^.x)),limits=c(0.2,2000))
 xscale = scale_x_continuous(limits = c(0,60),breaks = seq(0,60,12),labels=as.character(seq(0,10,2)))
 fonts = theme(axis.text=element_text(size=4), axis.title=element_text(size=4),strip.text.x = element_text(size = 1),plot.title=element_text(size=6))
