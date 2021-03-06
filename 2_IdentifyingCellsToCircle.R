@@ -1,10 +1,12 @@
-#Based on the combined data from multiple experiments, make a list of the cells that are of the appropriate ages for study
+#Based on the combined data from multiple experiments, make a list of the cells that are of the appropriate ages for study. These cells will be circled to measure Whi5-YFP fluorescence. 
 #We only include cells from the old experiments >= age 15 at the time of doxycycline exposure
+#Tables listing the cells to circle are saved in './TrapsToMeasure_oldover15/'. The smallest and largest fluorescent snapshot indices for which to circle the cells (when the cells are alive and uncensored) is also saved in the table.
 
-setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/timeseries_func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/Preprocessing_func.Rd')
+setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips_git')
+source('./functions/timeseries_func.Rd')
+source('./functions/func.Rd')
+source('./functions/Preprocessing_func.Rd')
+
 library(dplyr)
 library(ggplot2)
 library(reshape2)
