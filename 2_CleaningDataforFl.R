@@ -1,10 +1,13 @@
-setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips')
 #Determining the cells for which there are fluorescence measurements. 
 #This is based on the time that the traps are fully occupied and the last observation time
+#Only cells that are born before time 43 (for young experiments), and cells in the old experiments are considered. Young cells have to also divide at least once prior to doxycycline removal
+#The resulting list of cells is saved in "./CombinedData/infoall2.csv"
 
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/timeseries_func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/func.Rd')
-source('/Users/thomasyoung/Dropbox/templates/R_aging_template/functions/Preprocessing_func.Rd')
+setwd('/Users/thomasyoung/Dropbox/MovieProcessing/Whi5Localization_maxips_git')
+source('./functions/timeseries_func.Rd')
+source('./functions/func.Rd')
+source('./functions/Preprocessing_func.Rd')
+
 library(dplyr)
 library(ggplot2)
 library(reshape2)
