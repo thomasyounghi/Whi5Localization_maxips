@@ -3,7 +3,7 @@ This repository contains analysis scripts for assessing G1 duration and budding 
 The two strains both have SSAcontrol cassettes, but differ in that yTY159b has a stable RFP in the cassette, while yTY160a has an RFP-degron.
 The RFPdegron was expected to result in shorter G1 durations in yTY160a since the degron itself is also involved in degradation of Cln2, which is needed to progress from G1 to S phase.
 
-## Order to run the scrips
+## Order to run the scripts
 1_CombiningData.R  
 2_CleaningDataforFl.R  
 2_IdentifyingCellsToCircle.R  
